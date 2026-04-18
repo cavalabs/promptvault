@@ -3,9 +3,32 @@
 import { PromptVisibility } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import bcrypt from "bcryptjs";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
+
+export async function registerUser(
+  formData: FormData,
+): Promise<{ error: string } | { success: true }> {
+  const name = String(formData.get("name") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+
+  if (!email || !password) return { error: "Email e senha são obrigatórios." };
+  if (password.length < 6) return { error: "Senha deve ter pelo menos 6 caracteres." };
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) return { error: "Email já cadastrado." };
+
+  const hashed = await bcrypt.hash(password, 10);
+
+  await prisma.user.create({
+    data: { name: name || null, email, password: hashed },
+  });
+
+  return { success: true };
+}
 
 function requiredString(formData: FormData, key: string) {
   const value = formData.get(key);

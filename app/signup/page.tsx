@@ -2,36 +2,28 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { registerUser } from "@/app/actions";
 
-function SignInForm() {
-  const params = useSearchParams();
-  const error = params.get("error");
-  const registered = params.get("registered");
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function SignUpPage() {
+  const router = useRouter();
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    setFormError("");
+    setError("");
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    const formData = new FormData(e.currentTarget);
+    const result = await registerUser(formData);
 
-    if (res?.error) {
-      setFormError("Email ou senha incorretos.");
+    if ("error" in result) {
+      setError(result.error);
       setLoading(false);
     } else {
-      window.location.href = "/";
+      router.push("/signin?registered=1");
     }
   }
 
@@ -53,9 +45,6 @@ function SignInForm() {
               <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-6xl">
                 Your prompts, organized around your workflow.
               </h1>
-              <p className="mt-5 text-base leading-7 text-[#d7f4eb]">
-                Save reusable prompts, group them by category, tag the useful ones, and share only what you choose.
-              </p>
             </div>
             <div className="grid gap-3 text-sm text-[#d7f4eb] sm:grid-cols-3">
               <span className="rounded-[8px] bg-white/10 p-3">Private by default</span>
@@ -66,70 +55,54 @@ function SignInForm() {
 
           <div className="flex flex-col justify-center p-8 md:p-10">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#006d5b]">
-              Sign in
+              Criar conta
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              Continue to your vault
+              Crie seu vault
             </h2>
-
-            {registered && (
-              <div className="mt-4 rounded-[8px] border border-green-200 bg-green-50 p-3 text-sm text-green-800">
-                Conta criada! Faça login abaixo.
-              </div>
-            )}
-
-            {error && (
-              <div className="mt-4 rounded-[8px] border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-                Erro ao entrar. Tente novamente.
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="mt-6 grid gap-3">
               <input
+                name="name"
+                type="text"
+                placeholder="Nome (opcional)"
+                className="h-12 rounded-[8px] border border-[#cfd4ca] px-4 text-sm outline-none focus:border-[#006d5b]"
+              />
+              <input
+                name="email"
                 type="email"
                 placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="h-12 rounded-[8px] border border-[#cfd4ca] px-4 text-sm outline-none focus:border-[#006d5b]"
               />
               <input
+                name="password"
                 type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Senha (mínimo 6 caracteres)"
                 required
                 className="h-12 rounded-[8px] border border-[#cfd4ca] px-4 text-sm outline-none focus:border-[#006d5b]"
               />
-              {formError && (
-                <p className="text-sm text-red-600">{formError}</p>
+              {error && (
+                <p className="text-sm text-red-600">{error}</p>
               )}
               <button
                 type="submit"
                 disabled={loading}
                 className="flex h-12 items-center justify-center rounded-[8px] bg-[#006d5b] px-4 text-sm font-semibold text-white transition hover:bg-[#005a4a] disabled:opacity-60"
               >
-                {loading ? "Entrando..." : "Entrar"}
+                {loading ? "Criando conta..." : "Criar conta"}
               </button>
             </form>
 
             <p className="mt-4 text-center text-sm text-[#686d64]">
-              Não tem conta?{" "}
-              <Link href="/signup" className="font-semibold text-[#006d5b] hover:underline">
-                Criar conta
+              Já tem conta?{" "}
+              <Link href="/signin" className="font-semibold text-[#006d5b] hover:underline">
+                Entrar
               </Link>
             </p>
           </div>
         </div>
       </section>
     </main>
-  );
-}
-
-export default function SignInPage() {
-  return (
-    <Suspense>
-      <SignInForm />
-    </Suspense>
   );
 }
