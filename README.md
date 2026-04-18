@@ -80,3 +80,5 @@ The container starts with:
 ```bash
 npx prisma migrate deploy && npm run start
 ```
+
+For a direct VPS deploy, use `compose.prod.yml` with a private `.env.production` file on the server.

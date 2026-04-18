@@ -1,0 +1,62 @@
+name: promptvault
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: promptvault-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - promptvault-postgres:/var/lib/postgresql/data
+    networks:
+      - promptvault
+
+  app:
+    container_name: promptvault-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DIRECT_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+      - traefik.http.routers.promptvault-http.entrypoints=http
+      - traefik.http.routers.promptvault-http.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.promptvault-http.middlewares=promptvault-https-redirect
+      - traefik.http.middlewares.promptvault-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.promptvault-https.entrypoints=https
+      - traefik.http.routers.promptvault-https.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.promptvault-https.tls=true
+      - traefik.http.routers.promptvault-https.tls.certresolver=letsencrypt
+      - traefik.http.services.promptvault.loadbalancer.server.port=3000
+    networks:
+      - promptvault
+      - coolify
+
+volumes:
+  promptvault-postgres:
+
+networks:
+  promptvault:
+  coolify:
+    external: true
