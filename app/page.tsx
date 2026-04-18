@@ -6,8 +6,9 @@ import {
   setVisibility,
   toggleFavorite,
 } from "@/app/actions";
-import { getDemoUser } from "@/lib/demo-user";
+import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,12 @@ type HomeProps = {
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const user = await getDemoUser();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/signin");
+  }
+
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
   const promptWhere = {
@@ -121,7 +127,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </nav>
           </div>
           <div className="grid size-12 place-items-center rounded-[8px] bg-[#f1f4ed] text-sm font-bold text-[#3d423a]">
-            CV
+            {initials(user.name ?? user.email ?? "PV")}
           </div>
         </aside>
 
@@ -130,27 +136,35 @@ export default async function Home({ searchParams }: HomeProps) {
             <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#006d5b]">
-                  CavaLabs
+                  {user.name ?? user.email}
                 </p>
                 <h1 className="text-3xl font-semibold tracking-tight text-[#171a16]">
                   PromptVault
                 </h1>
               </div>
-              <form action="/" className="flex w-full max-w-xl gap-2">
-                <label className="sr-only" htmlFor="search">
-                  Search prompts
-                </label>
-                <input
-                  id="search"
-                  name="q"
-                  defaultValue={query}
-                  placeholder="Search title, content, or notes"
-                  className="h-12 min-w-0 flex-1 rounded-[8px] border border-[#cfd4ca] bg-white px-4 text-sm outline-none transition focus:border-[#006d5b] focus:ring-4 focus:ring-[#006d5b]/10"
-                />
-                <button className="h-12 rounded-[8px] bg-[#006d5b] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#005143]">
-                  Search
-                </button>
-              </form>
+              <div className="flex w-full max-w-2xl flex-col gap-3 sm:flex-row">
+                <form action="/" className="flex min-w-0 flex-1 gap-2">
+                  <label className="sr-only" htmlFor="search">
+                    Search prompts
+                  </label>
+                  <input
+                    id="search"
+                    name="q"
+                    defaultValue={query}
+                    placeholder="Search title, content, or notes"
+                    className="h-12 min-w-0 flex-1 rounded-[8px] border border-[#cfd4ca] bg-white px-4 text-sm outline-none transition focus:border-[#006d5b] focus:ring-4 focus:ring-[#006d5b]/10"
+                  />
+                  <button className="h-12 rounded-[8px] bg-[#006d5b] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#005143]">
+                    Search
+                  </button>
+                </form>
+                <Link
+                  href="/api/auth/signout"
+                  className="flex h-12 items-center justify-center rounded-[8px] border border-[#cfd4ca] bg-white px-4 text-sm font-semibold text-[#3d423a] transition hover:border-[#006d5b]"
+                >
+                  Sign out
+                </Link>
+              </div>
             </div>
           </header>
 
@@ -368,6 +382,15 @@ export default async function Home({ searchParams }: HomeProps) {
       </div>
     </main>
   );
+}
+
+function initials(value: string) {
+  return value
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.at(0)?.toUpperCase())
+    .join("");
 }
 
 function Metric({

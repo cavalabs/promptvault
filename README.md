@@ -71,9 +71,20 @@ DATABASE_URL="postgresql://..."
 DIRECT_DATABASE_URL="postgresql://..."
 NEXTAUTH_URL="https://your-domain.com"
 NEXTAUTH_SECRET="replace-with-a-long-random-secret"
+GITHUB_CLIENT_ID="..."
+GITHUB_CLIENT_SECRET="..."
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
 ```
 
 `DATABASE_URL` is used by Prisma migrations. `DIRECT_DATABASE_URL` is used by the app through `@prisma/adapter-pg`. In a simple Coolify Postgres setup, both can use the same internal PostgreSQL connection string.
+
+OAuth callback URLs:
+
+```text
+https://your-domain.com/api/auth/callback/github
+https://your-domain.com/api/auth/callback/google
+```
 
 The container starts with:
 

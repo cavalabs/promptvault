@@ -3,7 +3,7 @@
 import { PromptVisibility } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getDemoUser } from "@/lib/demo-user";
+import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
 
@@ -15,6 +15,16 @@ function requiredString(formData: FormData, key: string) {
   }
 
   return value.trim();
+}
+
+async function requireUser() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/signin");
+  }
+
+  return user;
 }
 
 async function uniquePromptSlug(userId: string, title: string) {
@@ -102,7 +112,7 @@ async function tagConnections(rawTags: string) {
 }
 
 export async function createPrompt(formData: FormData) {
-  const user = await getDemoUser();
+  const user = await requireUser();
   const title = requiredString(formData, "title");
   const content = requiredString(formData, "content");
   const description = String(formData.get("description") ?? "").trim();
@@ -135,7 +145,7 @@ export async function createPrompt(formData: FormData) {
 }
 
 export async function deletePrompt(formData: FormData) {
-  const user = await getDemoUser();
+  const user = await requireUser();
   const id = requiredString(formData, "id");
 
   await prisma.prompt.deleteMany({
@@ -149,7 +159,7 @@ export async function deletePrompt(formData: FormData) {
 }
 
 export async function toggleFavorite(formData: FormData) {
-  const user = await getDemoUser();
+  const user = await requireUser();
   const id = requiredString(formData, "id");
   const isFavorite = requiredString(formData, "isFavorite") === "true";
 
@@ -167,7 +177,7 @@ export async function toggleFavorite(formData: FormData) {
 }
 
 export async function setVisibility(formData: FormData) {
-  const user = await getDemoUser();
+  const user = await requireUser();
   const id = requiredString(formData, "id");
   const visibility = requiredString(formData, "visibility") as PromptVisibility;
 
