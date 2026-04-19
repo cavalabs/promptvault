@@ -3,6 +3,7 @@
 import { PromptVisibility } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -28,6 +29,16 @@ export async function registerUser(
   });
 
   return { success: true };
+}
+
+export async function setTheme(formData: FormData) {
+  const theme = String(formData.get("theme") ?? "dark");
+  const cookieStore = await cookies();
+  cookieStore.set("theme", theme === "light" ? "light" : "dark", {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+  revalidatePath("/", "layout");
 }
 
 function requiredString(formData: FormData, key: string) {

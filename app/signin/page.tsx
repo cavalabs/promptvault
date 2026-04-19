@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -8,27 +7,22 @@ import { useState, Suspense } from "react";
 
 function SignInForm() {
   const params = useSearchParams();
-  const error = params.get("error");
   const registered = params.get("registered");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState("");
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setFormError("");
+    setError("");
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    const res = await signIn("credentials", { email, password, redirect: false });
 
     if (res?.error) {
-      setFormError("Email ou senha incorretos.");
+      setError("Email ou senha incorretos.");
       setLoading(false);
     } else {
       window.location.href = "/";
@@ -36,95 +30,91 @@ function SignInForm() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f8f5] px-4 py-8 text-[#1c1b1f]">
-      <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center">
-        <div className="grid w-full overflow-hidden rounded-[8px] border border-[#dfe2da] bg-white shadow-[0_16px_50px_rgba(28,27,31,0.10)] lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="flex min-h-[560px] flex-col justify-between bg-[#006d5b] p-8 text-white md:p-10">
-            <div className="flex items-center gap-3">
-              <span className="grid size-12 place-items-center rounded-[8px] bg-white/15">
-                <Image src="/globe.svg" alt="PromptVault" width={24} height={24} />
-              </span>
-              <span className="text-lg font-semibold">PromptVault</span>
-            </div>
-            <div className="max-w-xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#bcefe0]">
-                Private prompt library
-              </p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-6xl">
-                Your prompts, organized around your workflow.
-              </h1>
-              <p className="mt-5 text-base leading-7 text-[#d7f4eb]">
-                Save reusable prompts, group them by category, tag the useful ones, and share only what you choose.
-              </p>
-            </div>
-            <div className="grid gap-3 text-sm text-[#d7f4eb] sm:grid-cols-3">
-              <span className="rounded-[8px] bg-white/10 p-3">Private by default</span>
-              <span className="rounded-[8px] bg-white/10 p-3">Fast search</span>
-              <span className="rounded-[8px] bg-white/10 p-3">Public links</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-center p-8 md:p-10">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#006d5b]">
-              Sign in
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              Continue to your vault
-            </h2>
-
-            {registered && (
-              <div className="mt-4 rounded-[8px] border border-green-200 bg-green-50 p-3 text-sm text-green-800">
-                Conta criada! Faça login abaixo.
-              </div>
-            )}
-
-            {error && (
-              <div className="mt-4 rounded-[8px] border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-                Erro ao entrar. Tente novamente.
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="mt-6 grid gap-3">
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-12 rounded-[8px] border border-[#cfd4ca] px-4 text-sm outline-none focus:border-[#006d5b]"
-              />
-              <input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-12 rounded-[8px] border border-[#cfd4ca] px-4 text-sm outline-none focus:border-[#006d5b]"
-              />
-              {formError && (
-                <p className="text-sm text-red-600">{formError}</p>
-              )}
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex h-12 items-center justify-center rounded-[8px] bg-[#006d5b] px-4 text-sm font-semibold text-white transition hover:bg-[#005a4a] disabled:opacity-60"
-              >
-                {loading ? "Entrando..." : "Entrar"}
-              </button>
-            </form>
-
-            <p className="mt-4 text-center text-sm text-[#686d64]">
-              Não tem conta?{" "}
-              <Link href="/signup" className="font-semibold text-[#006d5b] hover:underline">
-                Criar conta
-              </Link>
-            </p>
-          </div>
+    <div style={{
+      minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+      background: "var(--bg)", padding: 24,
+    }}>
+      <div style={{
+        width: "100%", maxWidth: 400,
+        background: "var(--bg-card)", border: "1px solid var(--border)",
+        borderRadius: 16, padding: "40px 36px",
+      }}>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 9, background: "var(--accent)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontWeight: 800, fontSize: 16, color: "white", fontFamily: "monospace",
+          }}>P</div>
+          <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text)" }}>
+            Prompt<span style={{ color: "var(--accent)" }}>Vault</span>
+          </span>
         </div>
-      </section>
-    </main>
+
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
+          Continue to your vault
+        </h1>
+        <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 28 }}>
+          Sign in to access your prompt library.
+        </p>
+
+        {registered && (
+          <div style={{
+            padding: "10px 14px", borderRadius: 8, marginBottom: 16,
+            background: "rgba(16,163,127,0.12)", color: "#10a37f", fontSize: 13,
+          }}>
+            Account created! Sign in below.
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label style={labelStyle}>Email</label>
+            <input
+              type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              required placeholder="you@example.com" style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Password</label>
+            <input
+              type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+              required placeholder="••••••••" style={inputStyle}
+            />
+          </div>
+          {error && <p style={{ fontSize: 13, color: "#f87171" }}>{error}</p>}
+          <button type="submit" disabled={loading} style={{
+            height: 44, borderRadius: 9, background: "var(--accent)",
+            color: "white", border: "none", fontSize: 14, fontWeight: 700,
+            cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1,
+            marginTop: 4,
+          }}>
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
+        </form>
+
+        <p style={{ marginTop: 24, textAlign: "center", fontSize: 13, color: "var(--text-muted)" }}>
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
+            Create one
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 }
+
+const inputStyle: React.CSSProperties = {
+  width: "100%", height: 42, padding: "0 14px", borderRadius: 8,
+  border: "1px solid var(--border)", background: "var(--input-bg)",
+  color: "var(--text)", fontSize: 14, outline: "none",
+};
+
+const labelStyle: React.CSSProperties = {
+  display: "block", fontSize: 12, fontWeight: 600,
+  color: "var(--text-muted)", marginBottom: 6,
+  textTransform: "uppercase", letterSpacing: "0.06em",
+};
 
 export default function SignInPage() {
   return (
