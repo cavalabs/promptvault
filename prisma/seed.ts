@@ -1,7 +1,9 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL ?? "";
+const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
 const prompts = [
   {
