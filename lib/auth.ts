@@ -3,7 +3,7 @@ import { type NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 const providers: NextAuthOptions["providers"] = [
