@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
+    "tsx": "^4.21.0",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "@types/bcryptjs": "^2.4.6",
@@ -39,7 +40,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
-    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
