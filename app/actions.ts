@@ -153,6 +153,7 @@ export async function createPrompt(formData: FormData) {
   const categoryName = String(formData.get("category") ?? "");
   const rawTags = String(formData.get("tags") ?? "");
   const visibility = String(formData.get("visibility") ?? "PRIVATE") as PromptVisibility;
+  const model = String(formData.get("model") ?? "").trim() || null;
   const category = await categoryFromForm(user.id, categoryName);
   const tagIds = await tagConnections(rawTags);
   const slug = await uniquePromptSlug(user.id, title);
@@ -163,6 +164,7 @@ export async function createPrompt(formData: FormData) {
       slug,
       content,
       description: description || null,
+      model,
       visibility: Object.values(PromptVisibility).includes(visibility)
         ? visibility
         : PromptVisibility.PRIVATE,
@@ -174,8 +176,8 @@ export async function createPrompt(formData: FormData) {
     },
   });
 
-  revalidatePath("/");
-  redirect("/");
+  revalidatePath("/library");
+  redirect("/library");
 }
 
 export async function deletePrompt(formData: FormData) {

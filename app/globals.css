@@ -3,22 +3,22 @@
 :root,
 [data-theme="dark"] {
   --bg: #09090d;
-  --bg-card: #131318;
+  --bg-card: #111116;
   --bg-sidebar: #0d0d12;
-  --border: #1e1e2a;
+  --border: #27273a;
   --accent: #7c6ef5;
   --accent-hover: #6a5de0;
-  --accent-muted: rgba(124, 110, 245, 0.12);
-  --text: #e0e0ed;
-  --text-muted: #4a4a62;
-  --text-faint: #2e2e42;
-  --input-bg: #131318;
-  --tag-green: rgba(16, 163, 127, 0.15);
-  --tag-green-text: #10a37f;
-  --tag-blue: rgba(66, 133, 244, 0.15);
-  --tag-blue-text: #4285f4;
-  --tag-amber: rgba(200, 149, 108, 0.15);
-  --tag-amber-text: #c8956c;
+  --accent-muted: rgba(124, 110, 245, 0.15);
+  --text: #f2f2ff;
+  --text-muted: #9090b0;
+  --text-faint: #3a3a52;
+  --input-bg: #0d0d12;
+  --tag-green: rgba(16, 163, 127, 0.2);
+  --tag-green-text: #34d399;
+  --tag-blue: rgba(96, 165, 250, 0.2);
+  --tag-blue-text: #60a5fa;
+  --tag-amber: rgba(251, 191, 36, 0.2);
+  --tag-amber-text: #fbbf24;
 }
 
 [data-theme="light"] {

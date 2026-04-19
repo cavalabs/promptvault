@@ -87,6 +87,7 @@ model Prompt {
   description String?
   visibility  PromptVisibility @default(PRIVATE)
   isFavorite  Boolean          @default(false)
+  model       String?
   userId      String
   categoryId  String?
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -93,6 +93,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <nav style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
           <NavItem href="/" icon="◈" label="Prompts" active={!categoryFilter} />
           <NavItem href="/?favorites=1" icon="★" label="Favorites" />
+          <NavItem href="/explore" icon="◎" label="Explore" />
           <div style={{ marginTop: 16, marginBottom: 8, paddingLeft: 8, fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
             Categories
           </div>
