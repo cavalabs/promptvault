@@ -176,7 +176,9 @@ export async function createPrompt(formData: FormData) {
     },
   });
 
+  revalidatePath("/");
   revalidatePath("/library");
+  revalidatePath("/explore");
   redirect("/library");
 }
 
@@ -192,6 +194,8 @@ export async function deletePrompt(formData: FormData) {
   });
 
   revalidatePath("/");
+  revalidatePath("/library");
+  revalidatePath("/explore");
 }
 
 export async function toggleFavorite(formData: FormData) {
@@ -210,6 +214,7 @@ export async function toggleFavorite(formData: FormData) {
   });
 
   revalidatePath("/");
+  revalidatePath("/library");
 }
 
 export async function setVisibility(formData: FormData) {
@@ -230,4 +235,6 @@ export async function setVisibility(formData: FormData) {
   });
 
   revalidatePath("/");
+  revalidatePath("/library");
+  revalidatePath("/explore");
 }

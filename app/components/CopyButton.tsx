@@ -15,12 +15,18 @@ export function CopyButton({ text }: { text: string }) {
     <button
       onClick={handleCopy}
       style={{
-        display: "flex", alignItems: "center", gap: 8,
-        padding: "10px 20px", borderRadius: 8,
-        background: copied ? "rgba(52,211,153,0.15)" : "var(--accent)",
-        color: copied ? "#34d399" : "white",
-        border: "none", fontSize: 14, fontWeight: 700,
-        cursor: "pointer", transition: "all 0.2s",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "10px 14px",
+        borderRadius: 8,
+        background: copied ? "var(--accent-soft)" : "var(--accent)",
+        color: copied ? "var(--accent)" : "white",
+        border: "1px solid " + (copied ? "var(--border-strong)" : "transparent"),
+        fontSize: 13,
+        fontWeight: 800,
+        cursor: "pointer",
+        transition: "transform 120ms ease, background-color 120ms ease",
       }}
     >
       {copied ? "✓ Copied!" : "Copy prompt"}

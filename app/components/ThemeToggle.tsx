@@ -21,10 +21,18 @@ export function ThemeToggle({ current }: { current: "dark" | "light" }) {
     <button
       onClick={toggle}
       style={{
-        display: "flex", alignItems: "center", gap: 10,
-        padding: "12px 16px", borderRadius: 10, width: "100%",
-        background: "var(--accent-muted)", border: "1px solid var(--border)",
-        color: "var(--text)", cursor: "pointer", fontSize: 14, fontWeight: 600,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "10px 12px",
+        borderRadius: 8,
+        width: "100%",
+        background: "var(--bg-elevated)",
+        border: "1px solid var(--border)",
+        color: "var(--text)",
+        cursor: "pointer",
+        fontSize: 13,
+        fontWeight: 700,
       }}
     >
       <span style={{ fontSize: 18 }}>{optimistic === "dark" ? "☀️" : "🌙"}</span>

@@ -14,8 +14,10 @@ export default function NewPromptPage() {
   const [tagInput, setTagInput] = useState("");
 
   function addTag(raw: string) {
-    const t = raw.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
-    if (t && !tags.includes(t)) setTags([...tags, t]);
+    const normalized = raw.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+    if (normalized && !tags.includes(normalized)) {
+      setTags([...tags, normalized]);
+    }
     setTagInput("");
   }
 
@@ -30,90 +32,47 @@ export default function NewPromptPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
-      {/* Header */}
-      <header style={{
-        padding: "14px 28px", borderBottom: "1px solid var(--border)",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        background: "var(--bg-sidebar)", position: "sticky", top: 0, zIndex: 20,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <Link href="/library" style={{ color: "var(--text-muted)", textDecoration: "none", fontSize: 13 }}>
-            ← Back
-          </Link>
-          <h1 style={{ fontSize: 18, fontWeight: 700, color: "var(--text)" }}>New Prompt</h1>
+      <header style={pageHeader}>
+        <div>
+          <p style={eyebrow}>Workspace</p>
+          <h1 style={heading}>New prompt</h1>
+          <p style={subtitle}>Shape a prompt once and reuse it everywhere.</p>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/library" style={{
-            padding: "8px 18px", borderRadius: 8,
-            border: "1px solid var(--border)", color: "var(--text)",
-            fontWeight: 600, fontSize: 13, textDecoration: "none",
-            display: "flex", alignItems: "center",
-          }}>
-            Cancel
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <Link href="/library" style={ghostButton}>
+            Back to library
           </Link>
-          <button
-            form="prompt-form"
-            type="submit"
-            style={{
-              padding: "8px 18px", borderRadius: 8,
-              background: "var(--accent)", color: "white",
-              fontWeight: 700, fontSize: 13, border: "none", cursor: "pointer",
-            }}
-          >
-            Create Prompt
+          <button form="prompt-form" type="submit" style={primaryButton}>
+            Save prompt
           </button>
         </div>
       </header>
 
-      {/* Body */}
-      <div style={{ display: "flex", height: "calc(100vh - 57px)" }}>
-        {/* Main editor */}
-        <form
-          id="prompt-form"
-          action={createPrompt}
-          style={{ flex: 1, padding: "28px 32px", display: "flex", flexDirection: "column", gap: 24, overflowY: "auto" }}
-        >
-          {/* Hidden tags */}
+      <div style={pageGrid}>
+        <form id="prompt-form" action={createPrompt} style={editorColumn}>
           <input type="hidden" name="tags" value={tags.join(",")} />
 
-          {/* Title */}
-          <div>
-            <label style={labelStyle}>Title</label>
-            <input
-              name="title"
-              required
-              placeholder="e.g. Code Review Assistant"
-              style={{
-                ...inputStyle,
-                height: 48, fontSize: 16, fontWeight: 500,
-                borderColor: "var(--accent)",
-              }}
-            />
-          </div>
+          <section style={panel}>
+            <label style={fieldLabelStyle}>Title</label>
+            <input name="title" required placeholder="e.g. Code review assistant" style={titleInput} />
+          </section>
 
-          {/* Editor / Preview tabs */}
-          <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <div style={{ display: "flex", gap: 0 }}>
-                {(["editor", "preview"] as const).map((t) => (
+          <section style={panel}>
+            <div style={tabHeader}>
+              <div style={{ display: "flex", gap: 6 }}>
+                {(["editor", "preview"] as const).map((item) => (
                   <button
-                    key={t}
+                    key={item}
                     type="button"
-                    onClick={() => setTab(t)}
-                    style={{
-                      padding: "6px 16px", fontSize: 13, fontWeight: 600,
-                      background: "none", border: "none", cursor: "pointer",
-                      color: tab === t ? "var(--accent)" : "var(--text-muted)",
-                      borderBottom: tab === t ? "2px solid var(--accent)" : "2px solid transparent",
-                      textTransform: "capitalize",
-                    }}
+                    onClick={() => setTab(item)}
+                    style={tabButton(tab === item)}
                   >
-                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                    {item === "editor" ? "Editor" : "Preview"}
                   </button>
                 ))}
               </div>
               <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                Use <code style={{ color: "var(--accent)", background: "var(--accent-muted)", padding: "1px 5px", borderRadius: 4 }}>{"{{variable}}"}</code> for dynamic values
+                Use <code style={inlineCode}>{"{{variable}}"}</code> for dynamic values
               </span>
             </div>
 
@@ -123,95 +82,71 @@ export default function NewPromptPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 required
-                rows={14}
+                rows={16}
                 placeholder={"You are a helpful assistant.\n\nTask: {{task}}\n\nContext: {{context}}"}
-                style={{
-                  ...inputStyle, height: "auto", resize: "vertical",
-                  padding: "14px 16px", lineHeight: 1.7,
-                  fontFamily: "var(--font-mono)", fontSize: 13,
-                }}
+                style={textareaStyle}
               />
             ) : (
-              <div style={{
-                background: "var(--input-bg)", border: "1px solid var(--border)",
-                borderRadius: 8, padding: "14px 16px", minHeight: 260,
-              }}>
+              <div style={previewSurface}>
                 {content ? (
-                  <PromptContent content={content} maxHeight={400} />
+                  <PromptContent content={content} maxHeight={420} />
                 ) : (
-                  <p style={{ color: "var(--text-muted)", fontSize: 13, fontStyle: "italic" }}>
-                    Nothing to preview yet. Write your prompt in the Editor tab.
-                  </p>
+                  <p style={{ color: "var(--text-muted)", fontSize: 13 }}>Write something in the editor first.</p>
                 )}
               </div>
             )}
-          </div>
+          </section>
 
-          {/* Notes */}
-          <div>
-            <label style={labelStyle}>Notes</label>
+          <section style={panel}>
+            <label style={fieldLabelStyle}>Notes</label>
             <textarea
               name="description"
               rows={3}
-              placeholder="Tips for using this prompt effectively..."
-              style={{ ...inputStyle, height: "auto", padding: "12px 14px", resize: "vertical", lineHeight: 1.6 }}
+              placeholder="What this prompt is for, or when to use it."
+              style={textareaStyle}
             />
-          </div>
+          </section>
         </form>
 
-        {/* Metadata sidebar */}
-        <aside style={{
-          width: 260, borderLeft: "1px solid var(--border)",
-          background: "var(--bg-sidebar)", padding: "28px 20px",
-          display: "flex", flexDirection: "column", gap: 24, overflowY: "auto",
-        }}>
-          <div>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Metadata</h2>
-            <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Organize your prompt</p>
-          </div>
+        <aside style={sidebar}>
+          <section style={panel}>
+            <p style={eyebrow}>Metadata</p>
+            <h2 style={sectionTitle}>Organize</h2>
+            <p style={sectionText}>Add the details that make the prompt easier to find and reuse.</p>
+          </section>
 
-          <MetaField label="Model">
-            <select name="model" form="prompt-form" style={{ ...inputStyle, cursor: "pointer" }}>
+          <Field label="Model">
+            <select name="model" form="prompt-form" style={selectStyle}>
               <option value="">Select model</option>
-              {MODELS.map((m) => <option key={m} value={m}>{m}</option>)}
+              {MODELS.map((model) => (
+                <option key={model} value={model}>
+                  {model}
+                </option>
+              ))}
             </select>
-          </MetaField>
+          </Field>
 
-          <MetaField label="Category">
-            <input
-              name="category"
-              form="prompt-form"
-              placeholder="e.g. Marketing"
-              style={inputStyle}
-            />
-          </MetaField>
+          <Field label="Category">
+            <input name="category" form="prompt-form" placeholder="e.g. Marketing" style={inputStyle} />
+          </Field>
 
-          <MetaField label="Visibility">
-            <select name="visibility" form="prompt-form" defaultValue="PRIVATE" style={{ ...inputStyle, cursor: "pointer" }}>
+          <Field label="Visibility">
+            <select name="visibility" form="prompt-form" defaultValue="PRIVATE" style={selectStyle}>
               <option value="PRIVATE">Private</option>
               <option value="PUBLIC">Public</option>
               <option value="UNLISTED">Unlisted</option>
             </select>
-          </MetaField>
+          </Field>
 
-          <MetaField label="Tags">
-            <div style={{
-              border: "1px solid var(--border)", borderRadius: 8,
-              background: "var(--input-bg)", padding: "8px 10px",
-              display: "flex", flexWrap: "wrap", gap: 6,
-              minHeight: 42,
-            }}>
-              {tags.map((t) => (
-                <span key={t} style={{
-                  fontSize: 12, padding: "3px 8px", borderRadius: 6,
-                  background: "var(--accent-muted)", color: "var(--accent)", fontWeight: 600,
-                  display: "flex", alignItems: "center", gap: 4,
-                }}>
-                  #{t}
+          <Field label="Tags">
+            <div style={tagBox}>
+              {tags.map((tag) => (
+                <span key={tag} style={tagPill}>
+                  #{tag}
                   <button
                     type="button"
-                    onClick={() => setTags(tags.filter((x) => x !== t))}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: 14, lineHeight: 1, padding: 0 }}
+                    onClick={() => setTags(tags.filter((item) => item !== tag))}
+                    style={tagRemove}
                   >
                     ×
                   </button>
@@ -223,38 +158,269 @@ export default function NewPromptPage() {
                 onKeyDown={handleTagKey}
                 onBlur={() => tagInput && addTag(tagInput)}
                 placeholder={tags.length === 0 ? "Add tag..." : ""}
-                style={{
-                  border: "none", outline: "none", background: "none",
-                  color: "var(--text)", fontSize: 13, flex: 1, minWidth: 80,
-                }}
+                style={tagInputStyle}
               />
             </div>
-            <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>
-              Press Enter or comma to add
-            </p>
-          </MetaField>
+            <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Press Enter or comma to add</p>
+          </Field>
         </aside>
       </div>
     </div>
   );
 }
 
-function MetaField({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label: fieldLabel, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <label style={labelStyle}>{label}</label>
+      <label style={fieldLabelStyle}>{fieldLabel}</label>
       {children}
     </div>
   );
 }
 
-const labelStyle: React.CSSProperties = {
-  fontSize: 11, fontWeight: 700, color: "var(--text-muted)",
-  textTransform: "uppercase", letterSpacing: "0.1em",
+const pageHeader: React.CSSProperties = {
+  padding: "20px 28px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 16,
+  flexWrap: "wrap",
+  borderBottom: "1px solid var(--border)",
+  background: "color-mix(in srgb, var(--bg) 84%, transparent)",
+  position: "sticky",
+  top: 0,
+  zIndex: 20,
+  backdropFilter: "blur(18px)",
+};
+
+const pageGrid: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "minmax(0, 1.2fr) minmax(280px, 0.8fr)",
+  gap: 20,
+  padding: "24px 28px 36px",
+};
+
+const editorColumn: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+  minWidth: 0,
+};
+
+const sidebar: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+};
+
+const panel: React.CSSProperties = {
+  background: "var(--bg-elevated)",
+  border: "1px solid var(--border)",
+  borderRadius: 8,
+  padding: 18,
+  boxShadow: "var(--shadow-soft)",
+};
+
+const titleInput: React.CSSProperties = {
+  width: "100%",
+  height: 48,
+  padding: "0 14px",
+  borderRadius: 8,
+  border: "1px solid var(--border)",
+  background: "var(--input-bg)",
+  color: "var(--text)",
+  fontSize: 15,
+  fontWeight: 700,
+  outline: "none",
+};
+
+const textareaStyle: React.CSSProperties = {
+  width: "100%",
+  minHeight: 240,
+  padding: "14px 16px",
+  borderRadius: 8,
+  border: "1px solid var(--border)",
+  background: "var(--input-bg)",
+  color: "var(--text)",
+  fontSize: 13,
+  outline: "none",
+  resize: "vertical",
+  lineHeight: 1.7,
+  fontFamily: "var(--font-mono)",
+};
+
+const previewSurface: React.CSSProperties = {
+  background: "var(--input-bg)",
+  border: "1px solid var(--border)",
+  borderRadius: 8,
+  padding: 14,
+  minHeight: 240,
 };
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", height: 38, padding: "0 12px", borderRadius: 8,
-  border: "1px solid var(--border)", background: "var(--input-bg)",
-  color: "var(--text)", fontSize: 13, outline: "none",
+  width: "100%",
+  height: 40,
+  padding: "0 12px",
+  borderRadius: 8,
+  border: "1px solid var(--border)",
+  background: "var(--input-bg)",
+  color: "var(--text)",
+  fontSize: 13,
+  outline: "none",
+};
+
+const selectStyle: React.CSSProperties = {
+  ...inputStyle,
+  cursor: "pointer",
+};
+
+const fieldLabelStyle: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 800,
+  color: "var(--text-muted)",
+  textTransform: "uppercase",
+  letterSpacing: "0.12em",
+};
+
+const sectionTitle: React.CSSProperties = {
+  fontSize: 16,
+  fontWeight: 900,
+  color: "var(--text)",
+  marginTop: 8,
+};
+
+const sectionText: React.CSSProperties = {
+  fontSize: 13,
+  color: "var(--text-muted)",
+  marginTop: 6,
+  lineHeight: 1.6,
+};
+
+const tabHeader: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 12,
+  flexWrap: "wrap",
+  marginBottom: 12,
+};
+
+const tabButton = (active: boolean): React.CSSProperties => ({
+  height: 34,
+  padding: "0 12px",
+  borderRadius: 8,
+  border: "1px solid var(--border)",
+  background: active ? "var(--accent-soft)" : "var(--bg-elevated)",
+  color: active ? "var(--text)" : "var(--text-muted)",
+  fontSize: 13,
+  fontWeight: 800,
+  cursor: "pointer",
+});
+
+const inlineCode: React.CSSProperties = {
+  padding: "1px 6px",
+  borderRadius: 6,
+  background: "var(--accent-soft)",
+  color: "var(--accent)",
+  fontSize: 12,
+};
+
+const tagBox: React.CSSProperties = {
+  border: "1px solid var(--border)",
+  borderRadius: 8,
+  background: "var(--input-bg)",
+  padding: "8px 10px",
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 6,
+  minHeight: 42,
+};
+
+const tagPill: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  height: 26,
+  padding: "0 8px",
+  borderRadius: 8,
+  background: "var(--accent-soft)",
+  color: "var(--accent)",
+  fontSize: 12,
+  fontWeight: 800,
+};
+
+const tagRemove: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "var(--accent)",
+  cursor: "pointer",
+  padding: 0,
+  fontSize: 14,
+  lineHeight: 1,
+};
+
+const tagInputStyle: React.CSSProperties = {
+  border: "none",
+  outline: "none",
+  background: "none",
+  color: "var(--text)",
+  fontSize: 13,
+  flex: 1,
+  minWidth: 80,
+};
+
+const ghostButton: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+  height: 40,
+  padding: "0 14px",
+  borderRadius: 8,
+  border: "1px solid var(--border)",
+  background: "var(--bg-elevated)",
+  color: "var(--text)",
+  textDecoration: "none",
+  fontSize: 13,
+  fontWeight: 800,
+  cursor: "pointer",
+};
+
+const primaryButton: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+  height: 40,
+  padding: "0 14px",
+  borderRadius: 8,
+  border: "1px solid transparent",
+  background: "var(--accent)",
+  color: "white",
+  textDecoration: "none",
+  fontSize: 13,
+  fontWeight: 800,
+  cursor: "pointer",
+};
+
+const eyebrow: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 800,
+  color: "var(--accent-blue)",
+  textTransform: "uppercase",
+  letterSpacing: "0.14em",
+};
+
+const heading: React.CSSProperties = {
+  fontSize: 26,
+  fontWeight: 900,
+  color: "var(--text)",
+  letterSpacing: "-0.03em",
+  marginTop: 6,
+};
+
+const subtitle: React.CSSProperties = {
+  fontSize: 13,
+  color: "var(--text-muted)",
+  marginTop: 4,
 };
