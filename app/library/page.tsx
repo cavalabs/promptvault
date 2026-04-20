@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { deletePrompt, setVisibility, toggleFavorite } from "@/app/actions";
+import { FilterSelect } from "@/app/components/FilterSelect";
 import { Sidebar, ModelBadge } from "@/app/components/Sidebar";
 import { PromptContent } from "@/app/components/PromptContent";
 
@@ -265,42 +266,6 @@ function PromptCard({
   );
 }
 
-function FilterSelect({
-  label,
-  value,
-  param,
-  query,
-  favoritesOnly,
-  options,
-}: {
-  label: string;
-  value: string;
-  param: string;
-  query: string;
-  favoritesOnly: boolean;
-  options: { label: string; value: string }[];
-}) {
-  return (
-    <form action="/library" style={{ display: "inline-flex" }}>
-      {query && <input type="hidden" name="q" value={query} />}
-      {favoritesOnly && <input type="hidden" name="favorites" value="1" />}
-      <select
-        name={param}
-        defaultValue={value}
-        onChange={(e) => (e.target as HTMLSelectElement).form?.submit()}
-        style={selectStyle}
-      >
-        <option value="">{label}</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </form>
-  );
-}
-
 function VisibilityBadge({ visibility }: { visibility: "PRIVATE" | "PUBLIC" | "UNLISTED" }) {
   const map = {
     PRIVATE: { label: "Private", bg: "var(--bg-surface)", color: "var(--text-muted)" },
@@ -416,18 +381,6 @@ const searchInput: React.CSSProperties = {
   color: "var(--text)",
   outline: "none",
   fontSize: 13,
-};
-
-const selectStyle: React.CSSProperties = {
-  height: 40,
-  padding: "0 12px",
-  borderRadius: 8,
-  border: "1px solid var(--border)",
-  background: "var(--input-bg)",
-  color: "var(--text)",
-  outline: "none",
-  fontSize: 13,
-  cursor: "pointer",
 };
 
 const badgeStyle: React.CSSProperties = {
